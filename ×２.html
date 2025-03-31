@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<img id="failImage" src="hazure.png" alt="失敗画像" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 9999;" onclick="resetGame()">
+
+<img id="chanceImage1" src="bigchance.png" alt="大チャンス画像" style="
+    display: none;
+    position: fixed;
+    top: 40%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    width: 55vw;
+    height: auto;
+    z-index: 1000; pointer-events: none;">
+
+<img id="chanceImage2" src="chance.png" alt="チャンス画像" style="
+    display: none;
+    position: fixed;
+    top: 40%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    width: 55vw;
+    height: auto;
+    z-index: 1000; pointer-events: none;">
+
+
+
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>確率で倍増カウンター</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #counter {
+            font-size: 15em;
+            margin: 20px;
+            font-weight: bold;
+            transition: font-size 0.3s ease-in-out;
+            display: none;
+        }
+
+
+        #message {
+            font-size: 1.2em;
+            color: red;
+            margin-top: 10px;
+        }
+
+        #game,
+        #upgame,
+        #choice {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 id="title">
+        <img src="push.png" onclick="startGame()" style="width: 400px; cursor: pointer;">
+    </h1>
+
+    <!-- 通常ゲーム画面 -->
+    <div id="game">
+        <div id="counter" style="display: flex; justify-content: center; gap: 100px;">1</div>
+
+        <!-- 〇ボタンの代わりに画像 -->
+        <img src="marubutton.png" alt="〇ボタン" id="challengeBtn" onclick="doubleWithChance()"
+            style="width: 250px; cursor: pointer;">
+
+        <!-- ✖ボタンの代わりに画像 -->
+        <img src="batubutton.png" alt="✖ボタン" id="challengeBtn" onclick="doubleWithChance()"
+            style="width: 250px; cursor: pointer;">
+
+        <div id="message"></div>
+    </div>
+
+
+    <!-- 選択画面 -->
+    <div id="choice">
+        <h2>続けますか？</h2>
+        <div id="counterChoice">現在のカウンター: 1</div>
+        <div id="chanceMessage"></div>
+        <img src="continue_red.png" alt="continueボタン" id="continueBtn" onclick="continueGame()"
+            style="width: 400px; cursor: pointer;">
+        <img src="retire_blue.png" alt="retireボタン" id="retireBtn" onclick="resetGame()"
+            style="width: 400px; cursor: pointer;">
+    </div>
+
+    <script>
+        let value = 1;
+        let isFlipped = false;
+        let baseFontSize = 5;
+        let successCount = 0;
+
+        function startGame() {
+            document.getElementById('title').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            document.getElementById('counter').style.display = 'block';
+            document.getElementById('choice').style.display = 'none';
+            document.getElementById('failImage').style.display = "none";
+
+            value = 1;
+            successCount = 0;
+            updateCounter();
+            document.getElementById('message').innerText = "";
+        }
+        // Upchanceに変更
+        function upchangeButton() {
+            document.getElementById('challengeBtn').setAttribute('onclick', 'upChance()');
+        }
+
+        function bigupButton() {
+            document.getElementById('challengeBtn').setAttribute('onclick', 'bigChance()');
+        }
+
+        function WinButton() {
+            document.getElementById('challengeBtn').setAttribute('onclick', 'Win()');
+        }
+
+
+        // ボタン確率リセット
+        function resetChance() {
+            document.getElementById('challengeBtn').setAttribute('onclick', 'doubleWithChance()');
+        }
+
+        function Buttonreset() {
+            const continueButton = document.getElementById('continueBtn');
+            const currentSrc = continueBtn.src; // 現在のsrcを取得
+
+            // 現在の画像に基づいて条件分岐
+            if (currentSrc.includes("continue_blue.png")) {
+                continueButton.src = "continue_red.png";
+
+            } else {
+
+            }
+        }
+
+        function showFailScreen() {
+            let failImage = document.getElementById('failImage');
+            failImage.style.display = "block"; // 画像を表示
+        }
+
+
+        function updateCounter() {
+            document.getElementById('counter').innerText = value;
+        }
+
+        function doubleWithChance() {
+            let success = Math.random() < 0.5;
+
+            if (success) {
+                value *= 2;
+                successCount++;
+                updateCounter();
+                setTimeout(showChoiceScreen, 1000);
+            } else {
+                showFailScreen();
+            }
+        }
+
+        function upChance() {
+            let success = Math.random() < 0.70;
+
+            if (success) {
+                value *= 2;
+                successCount++;
+                updateCounter();
+                resetChance()
+                setTimeout(showChoiceScreen, 1000);
+            } else {
+                showFailScreen();
+            }
+        }
+
+        function bigChance() {
+            let success = Math.random() < 0.9;
+
+            if (success) {
+                value *= 2;
+                successCount++;
+                updateCounter();
+                resetChance()
+                setTimeout(showChoiceScreen, 1000);
+            } else {
+                showFailScreen();
+            }
+        }
+
+        function Win() {
+            value *= 2;
+            successCount++;
+            updateCounter();
+            resetChance()
+            Buttonreset()
+            setTimeout(showChoiceScreen, 1000);
+        }
+
+        function showChoiceScreen() {
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('choice').style.display = 'block';
+            document.getElementById('counterChoice').innerHTML = ` <span style="font-size: 10em;">${value}</span>`;
+
+
+            let randomValue = Math.random();
+            if (isFlipped) {
+                document.getElementById('counter').style.transform = "scaleX(1)";
+                isFlipped = false;
+            }
+            if (randomValue < 0.2) {
+                // 20%の確率で通常時 → さらに確率変動を適用
+                let specialRandom = Math.random(); // 追加の乱数生成
+
+                if (specialRandom < 0.25) {  // 25% の確率で「大チャンス！」
+                    bigupButton();
+                    chanceImage1.style.display = "block";
+                } else if (specialRandom < 0.85) {  // 60% の確率で「チャンス！」
+                    upchangeButton();
+                    chanceImage2.style.display = "block";
+                } else if (specialRandom < 0.95) {  // 10% の確率で「Win！」
+                    const continueButton = document.getElementById('continueBtn');
+                    continueButton.src = "continue_blue.png";
+                    Win();
+                } else {  // 5% の確率で「Win！」
+                    document.getElementById('counter').style.transform = "scaleX(-1)";
+                    isFlipped = true;
+                    Win();
+                }
+            } else {
+
+            }
+
+        }
+
+
+        function continueGame() {
+            document.getElementById('choice').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            document.getElementById('counter').style.display = 'block';  // 通常カウンターを表示
+            document.getElementById('chanceImage1').style.display = 'none';
+            document.getElementById('chanceImage2').style.display = 'none';
+            updateCounter();
+
+        }
+
+        function resetGame() {
+            document.getElementById('title').style.display = 'block';
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('counter').style.display = 'none';
+            document.getElementById('choice').style.display = 'none';
+            document.getElementById('failImage').style.display = "none";
+            document.getElementById('chanceImage1').style.display = 'none';
+            document.getElementById('chanceImage2').style.display = 'none';
+        }
+    </script>
+
+</body>
+
+</html>
